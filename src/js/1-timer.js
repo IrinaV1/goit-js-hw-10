@@ -8,6 +8,20 @@ const btn = document.querySelector('[data-start]');
 const input = document.querySelector('#datetime-picker');
 let userSelectedDate = null;
 // let isActive = false;
+iziToast.show({
+  title: '⚠️',
+  message: 'Please choose a date in the future',
+  theme: 'dark',
+  // color: 'red',
+  backgroundColor: '#ff0000',
+  position: 'topRight',
+  timeout: 4000,
+  progressBar: false,
+  close: true,
+  closeOnClick: true,
+  transitionIn: 'fadeInDown',
+  transitionOut: 'fadeOutUp',
+});
 
 const options = {
   enableTime: true,
@@ -17,20 +31,6 @@ const options = {
   onClose(selectedDates) {
     userSelectedDate = selectedDates[0];
     if (userSelectedDate < options.defaultDate) {
-      iziToast.show({
-        title: '⚠️',
-        message: 'Please choose a date in the future',
-        theme: 'dark',
-        // color: 'red',
-        backgroundColor: '#ff0000',
-        position: 'topRight',
-        timeout: 4000,
-        progressBar: false,
-        close: true,
-        closeOnClick: true,
-        transitionIn: 'fadeInDown',
-        transitionOut: 'fadeOutUp',
-      });
       btn.classList.remove('isActive');
     } else {
       btn.classList.add('isActive');
