@@ -8,6 +8,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 360px;
+  margin: 0 auto;
 }
 
 label {
@@ -37,6 +38,16 @@ label {
   outline: none;
   margin-top: 8px;
   padding: 0 16px;
+  transition: all 250ms ease-in-out;
+}
+
+.form>label:first-child input:hover {
+  border: 1px solid #000;
+}
+
+.form>label:first-child input:active,
+.form>label:first-child input:focus {
+  border: 1px solid #4e75ff;
 }
 
 fieldset {
@@ -46,6 +57,11 @@ fieldset {
   border: 1px solid #808080;
   margin-bottom: 24px;
   padding: 0 14px;
+}
+
+fieldset:hover,
+fieldset:active {
+  border: 1px solid #000;
 }
 
 fieldset label {
@@ -59,7 +75,12 @@ fieldset label input {
 
   margin: 0;
   width: 32px;
-  height: 32px
+  height: 32px;
+  transition: all 250ms ease-in-out;
+}
+
+fieldset>label input:hover {
+  border: 1px solid #000;
 }
 
 legend {
