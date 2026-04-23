@@ -1,7 +1,7 @@
 import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
-
 import iziToast from 'izitoast';
+
+import 'flatpickr/dist/flatpickr.min.css';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const btn = document.querySelector('[data-start]');
@@ -13,6 +13,7 @@ const minutesTime = document.querySelector('span[data-minutes]');
 const secondsTime = document.querySelector('span[data-seconds]');
 
 let userSelectedDate = null;
+btn.disabled = true;
 let isActive = false;
 let intervalId = null;
 
@@ -22,13 +23,13 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    userSelectedDate = selectedDates[0];
-    if (userSelectedDate < options.defaultDate) {
+    const currentDate = Date.now();
+    userSelectedDate = selectedDates[0].getTime();
+    if (userSelectedDate < currentDate) {
       iziToast.show({
         title: '⚠️',
         message: 'Please choose a date in the future',
         theme: 'dark',
-        // color: 'red',
         backgroundColor: '#ff0000',
         position: 'topRight',
         timeout: 4000,
@@ -39,12 +40,14 @@ const options = {
         transitionOut: 'fadeOutUp',
       });
       btn.classList.remove('isActive');
-    } else {
-      btn.classList.add('isActive');
+      btn.disabled = true;
+      return;
     }
-    console.log(options.defaultDate);
+    btn.classList.add('isActive');
+    btn.disabled = false;
 
-    console.log(selectedDates[0]);
+    console.log(currentDate);
+    console.log(selectedDates[0].getTime());
   },
 };
 
@@ -53,23 +56,38 @@ flatpickr(input, options);
 btn.addEventListener('click', handleClick);
 
 function handleClick() {
-  if (userSelectedDate) {
-    btn.classList.remove('isActive');
-  }
-  isActive = setTimeout(start, 1000);
-}
-function start() {
-  // if (isActive) {
-  //   return;
-  // }
-  // isActive = true;
+  btn.disabled = true;
+  input.disabled = true;
+  btn.classList.remove('isActive');
+
   intervalId = setInterval(() => {
-    const deltaTime = options.defaultDate - userSelectedDate;
+    const currentTime = Date.now();
+    const deltaTime = userSelectedDate - currentTime;
+
+    if (deltaTime <= 0) {
+      clearInterval(intervalId);
+
+      createTimerInterface({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      });
+
+      input.disabled = false;
+      iziToast.show({
+        message: 'Countdown finished!',
+        backgroundColor: 'green',
+        position: 'topRight',
+      });
+      return;
+    }
     const time = convertMs(deltaTime);
     createTimerInterface(time);
     console.log(time);
   }, 1000);
 }
+
 function convertMs(ms) {
   // Number of milliseconds per unit of time
   const second = 1000;
@@ -78,13 +96,13 @@ function convertMs(ms) {
   const day = hour * 24;
 
   // Remaining days
-  const days = pad(Math.floor(ms / day));
+  const days = Math.floor(ms / day);
   // Remaining hours
-  const hours = pad(Math.floor((ms % day) / hour));
+  const hours = Math.floor((ms % day) / hour);
   // Remaining minutes
-  const minutes = pad(Math.floor(((ms % day) % hour) / minute));
+  const minutes = Math.floor(((ms % day) % hour) / minute);
   // Remaining seconds
-  const seconds = pad(Math.floor((((ms % day) % hour) % minute) / second));
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
 }
@@ -94,8 +112,8 @@ function pad(value) {
 }
 
 function createTimerInterface({ days, hours, minutes, seconds }) {
-  daysTime.textContent = `${days}`;
-  hoursTime.textContent = `${hours}`;
-  minutesTime.textContent = `${minutes}`;
-  secondsTime.textContent = `${seconds}`;
+  daysTime.textContent = pad(days);
+  hoursTime.textContent = pad(hours);
+  minutesTime.textContent = pad(minutes);
+  secondsTime.textContent = pad(seconds);
 }
